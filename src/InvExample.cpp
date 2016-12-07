@@ -17,11 +17,11 @@ using namespace inv_example;
 
 int main(int argc, char *argv[])
 {
-    vector<uint8_t> bad_length{ 0xaa, static_cast<uint8_t>(MsgID::ForceCmdMsgID), 1 };
+    vector<uint8_t> bad_length{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), 1 };
     vector<uint8_t> bad_id{ 0xaa, 0xfe, 1, 0 };
-    vector<uint8_t> force_cmd{ 0xaa, static_cast<uint8_t>(MsgID::ForceCmdMsgID), sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };    // -123.45
-    vector<uint8_t> bad_data{ 0xaa, static_cast<uint8_t>(MsgID::ForceCmdMsgID), sizeof(double), 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };           // missing 1st byte
-    vector<uint8_t> cart_data{ 0xaa, static_cast<uint8_t>(MsgID::CartDataMsgID), 2 * sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD, 0x40, 0x09, 0x21, 0xFB, 0x4D, 0x12, 0xD8, 0x4A };  // -123.45, 3.1415926
+    vector<uint8_t> force_cmd{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };    // -123.45
+    vector<uint8_t> bad_data{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), sizeof(double), 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };           // missing 1st byte
+    vector<uint8_t> cart_data{ 0xaa, static_cast<uint8_t>(PacketId::CART_DATA), 2 * sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD, 0x40, 0x09, 0x21, 0xFB, 0x4D, 0x12, 0xD8, 0x4A };  // -123.45, 3.1415926
 
     auto msg1 = CartForceCmd(force_cmd, InvTimestamp());
 
