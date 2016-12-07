@@ -6,9 +6,9 @@
 
 #include <stdexcept>
 #include <map>
-#include "Timestamp.h"
+#include "timestamp.h"
 
-namespace InvExample {
+namespace inv_example {
 
 
   // ========================================
@@ -83,5 +83,5 @@ namespace InvExample {
   // ========================================
 #define NewInvError(code) InvError::InvError(code, __LINE__, __FILE__)
 
-} // namespace InvExample
+} // namespace inv_example
 #endif // __ERROR_H__

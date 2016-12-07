@@ -6,9 +6,9 @@
 #include <cstdint>
 #include <vector>
 #include <map>
-#include "Timestamp.h"
+#include "timestamp.h"
 
-namespace InvExample {
+namespace inv_example {
 
   // ========================================
   // Message type definitions
@@ -112,5 +112,5 @@ namespace InvExample {
     double CartVel;         // cart speed, m/s
   };
 
-} // namespace InvExample
+} // namespace inv_example
 #endif // __COMMS__
