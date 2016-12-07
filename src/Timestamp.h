@@ -14,14 +14,15 @@ namespace inv_example {
 // ================================================================================
 class InvTimestamp
 {
-public:
+public: // constructors
     // Create a new timestamp with the current time
     InvTimestamp() : m_t(std::chrono::steady_clock::now()) {};
 
+public: // methods
     // formatted output
     std::string to_string(void) const;             // Short string HH:MM:SS.sss in local time zone
 
-private:
+private: // data
     std::chrono::steady_clock::time_point m_t;      // timestamp stored in the std library type
 };
 
