@@ -11,47 +11,47 @@
 namespace inv_example {
 
 
-  // ========================================
-  // Error Fault Codes
-  // each code corresponds to an entry in the Error Table
-  // ========================================
-  enum class InvErrorCode {
+// ========================================
+// Error Fault Codes
+// each code corresponds to an entry in the Error Table
+// ========================================
+enum class InvErrorCode {
     NO_ERROR = 0,
     INVALID_MSG
-  };
+};
 
 
-  // ========================================
-  // Error Levels
-  // ========================================
-  enum class InvErrorLevel {
+// ========================================
+// Error Levels
+// ========================================
+enum class InvErrorLevel {
     NO_ERROR = 0,
-    FATAL = 1,   // the program will terminate
+    FATAL = 1,     // the program will terminate
     WARNING = 2,   // something wrong but program continues
-    INFO = 3    // informational, not necessarily a problem
-  };
+    INFO = 3       // informational, not necessarily a problem
+};
 
 
-  // ========================================
-  // Error definition table entry
-  // ========================================
-  struct InvErrorInfo
-  {
+// ========================================
+// Error definition table entry
+// ========================================
+struct InvErrorInfo
+{
     InvErrorLevel Level;    // severity of error
     std::string Msg;        // error message
 
     InvErrorInfo(InvErrorLevel level, std::string msg) : Level(level), Msg(msg) {};
     InvErrorInfo() = delete;    // cannot construct empty error
-  };
+};
 
 
-  // ========================================
-  // Error message object
-  // derived from a standard exception type
-  // ========================================
-  class InvError : public std::runtime_error
-  {
-  private:
+// ========================================
+// Error message object
+// derived from a standard exception type
+// ========================================
+class InvError : public std::runtime_error
+{
+private:
     const InvTimestamp Time;    // time of occurrence
     const InvErrorCode Code;    // error identifier
     const InvErrorLevel Level;  // indicates severity
@@ -62,25 +62,25 @@ namespace inv_example {
     // table of error codes
     static const std::map<InvErrorCode, InvErrorInfo> ErrorTable;
 
-  public:
+public:
     InvError::InvError(InvErrorCode code, int line, const std::string file)
-      : runtime_error(LookupErrorMsg(code)),          // store error message text in the base exception type
-      Time(),                                         // time is now
-      Code(code),
-      Level(LookupErrorLevel(code)),
-      Line(line),
-      File(file)
+        : runtime_error(LookupErrorMsg(code)),          // store error message text in the base exception type
+        Time(),                                         // time is now
+        Code(code),
+        Level(LookupErrorLevel(code)),
+        Line(line),
+        File(file)
     {};
 
     // static methods to look up error information
     static const InvErrorLevel LookupErrorLevel(InvErrorCode code);
     static const std::string LookupErrorMsg(InvErrorCode code);
-  };
+};
 
 
-  // ========================================
-  // Error creation macro records the filename and line number
-  // ========================================
+// ========================================
+// Error creation macro records the filename and line number
+// ========================================
 #define NewInvError(code) InvError::InvError(code, __LINE__, __FILE__)
 
 } // namespace inv_example

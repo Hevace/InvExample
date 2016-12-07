@@ -6,37 +6,37 @@
 using namespace std;
 namespace inv_example {
 
-  // ========================================
-  // Error Table
-  // ========================================
-  const map<InvErrorCode, InvErrorInfo> InvError::ErrorTable = {
+// ========================================
+// Error Table
+// ========================================
+const map<InvErrorCode, InvErrorInfo> InvError::ErrorTable = {
     { InvErrorCode::NO_ERROR, { InvErrorLevel::NO_ERROR, "No Error" } },
     { InvErrorCode::INVALID_MSG, { InvErrorLevel::FATAL, "Unable to decode a parsed message" } },
-  };
+};
 
 
-  // ========================================
-  // Look up information in the Error Table
-  // ========================================
-  const InvErrorLevel InvError::LookupErrorLevel(InvErrorCode code)
-  {
+// ========================================
+// Look up information in the Error Table
+// ========================================
+const InvErrorLevel InvError::LookupErrorLevel(InvErrorCode code)
+{
     try {
-      return ErrorTable.at(code).Level;
+        return ErrorTable.at(code).Level;
     }
     catch (out_of_range) {
-      return InvErrorLevel::WARNING;          // undefined error codes return as a warning
+        return InvErrorLevel::WARNING;          // undefined error codes return as a warning
     }
-  }
+}
 
 
-  const std::string InvError::LookupErrorMsg(InvErrorCode code)
-  {
+const std::string InvError::LookupErrorMsg(InvErrorCode code)
+{
     try {
-      return ErrorTable.at(code).Msg;
+        return ErrorTable.at(code).Msg;
     }
     catch (out_of_range) {
-      return "Undefined error";               // error code is not in the table
+        return "Undefined error";               // error code is not in the table
     }
-  }
+}
 
 } // namespace inv_example
