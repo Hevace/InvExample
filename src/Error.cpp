@@ -1,10 +1,10 @@
 // Error handling via exceptions
 // with fault codes, error messages, and error levels
 
-#include "Error.h"
+#include "error.h"
 
 using namespace std;
-namespace InvExample {
+namespace inv_example {
 
   // ========================================
   // Error Table
@@ -39,4 +39,4 @@ namespace InvExample {
     }
   }
 
-} // namespace InvExample
+} // namespace inv_example

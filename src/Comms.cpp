@@ -1,11 +1,11 @@
 // Implementation of interface messages
 
 #include <algorithm>
-#include "Comms.h"
-#include "Error.h"
+#include "comms.h"
+#include "error.h"
 
 using namespace std;
-namespace InvExample {
+namespace inv_example {
 
   // ================================================================================
   // Endian conversion routines
@@ -149,4 +149,4 @@ namespace InvExample {
     p = DoubleToBytes(p, cart_vel);
   }
 
-} // namespace InvExample
+} // namespace inv_example

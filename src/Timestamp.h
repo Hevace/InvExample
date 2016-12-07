@@ -6,7 +6,7 @@
 #include <iostream>
 #include <chrono>
 
-namespace InvExample {
+namespace inv_example {
 
   // ================================================================================
   // Implement timestamps using the std time library
@@ -16,21 +16,21 @@ namespace InvExample {
   {
   public:
     // Create a new timestamp with the current time
-    InvTimestamp() : t(std::chrono::steady_clock::now()) {};
+    InvTimestamp() : m_t(std::chrono::steady_clock::now()) {};
 
     // formatted output
-    std::string ToString(void) const;             // Short string HH:MM:SS.sss in local time zone
+    std::string to_string(void) const;             // Short string HH:MM:SS.sss in local time zone
 
   private:
-    std::chrono::steady_clock::time_point t;      // timestamp stored in the std library type
+    std::chrono::steady_clock::time_point m_t;      // timestamp stored in the std library type
   };
 
 
-} // namespace InvExample
+} // namespace inv_example
 
 // ========================================
 // formatted output of timestamp
 // ========================================
-std::ostream& operator<<(std::ostream& os, const InvExample::InvTimestamp& timestamp);
+std::ostream& operator<<(std::ostream& os, const inv_example::InvTimestamp& timestamp);
 
 #endif // __TIMESTAMP_H__

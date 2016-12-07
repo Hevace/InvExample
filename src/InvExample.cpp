@@ -4,8 +4,8 @@
 #include <windows.h>
 
 #include <iostream>
-#include "Comms.h"
-#include "Timestamp.h"
+#include "comms.h"
+#include "timestamp.h"
 
 #include <iomanip>
 #include <ctime>
@@ -13,7 +13,7 @@
 #include <string>
 
 using namespace std;
-using namespace InvExample;
+using namespace inv_example;
 
 int main(int argc, char *argv[])
 {
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
 
   cout << "Timestamp" << endl;
   auto ts = InvTimestamp();
-  cout << ts.ToString() << endl;
+  cout << ts.to_string() << endl;
   cout << ts << endl;
 
   return 0;
