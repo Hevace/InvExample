@@ -1,0 +1,3 @@
+[ ] Don't use exceptions for application errors and warnings
+[ ] Separate Comm Messages from in-app messages
+[ ] Separate platform dependencies, starting with the timestamp (subclass for each platform)
