@@ -8,22 +8,22 @@
 
 namespace inv_example {
 
-  // ================================================================================
-  // Implement timestamps using the std time library
-  // In windows the resolution is 15.6 msec
-  // ================================================================================
-  class InvTimestamp
-  {
-  public:
+// ================================================================================
+// Implement timestamps using the std time library
+// In windows the resolution is 15.6 msec
+// ================================================================================
+class InvTimestamp
+{
+public:
     // Create a new timestamp with the current time
     InvTimestamp() : m_t(std::chrono::steady_clock::now()) {};
 
     // formatted output
     std::string to_string(void) const;             // Short string HH:MM:SS.sss in local time zone
 
-  private:
+private:
     std::chrono::steady_clock::time_point m_t;      // timestamp stored in the std library type
-  };
+};
 
 
 } // namespace inv_example

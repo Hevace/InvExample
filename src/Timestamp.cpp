@@ -7,14 +7,14 @@
 
 namespace inv_example {
 
-  // ================================================================================
-  // Timestamp implementation for Windows
-  // ================================================================================
-  // ========================================
-  // formatted output as a short string HH:MM:SS.ffff
-  // ========================================
-  std::string InvTimestamp::to_string(void) const
-  {
+// ================================================================================
+// Timestamp implementation for Windows
+// ================================================================================
+// ========================================
+// formatted output as a short string HH:MM:SS.ffff
+// ========================================
+std::string InvTimestamp::to_string(void) const
+{
     std::stringstream outstr;   // return value
 
     std::chrono::duration<double, std::milli> t_fp = m_t.time_since_epoch();
@@ -29,7 +29,7 @@ namespace inv_example {
 
     outstr << str1 << "." << ms;
     return outstr.str();
-  }
+}
 
 } // namespace inv_example
 
