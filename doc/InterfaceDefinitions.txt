@@ -1,0 +1,86 @@
+Example Interface Definitions
+
+
+==================
+Operator Interface
+==================
+Text strings
+    Command Name = case-insensitive, no spaces
+    Whitespace
+    Argument List = comma-separated string
+Command Type Definitions
+    Reset Cmd = "reset"
+    Move To Cmd = "moveto x"
+        x = position in m
+    System Status Rpt = "status time, mode, cart_pos, pend_pos"
+        Sent at 100 Hz
+        time = system time in HH:mm:SS.ssss
+        mode = system mode
+        cart_pos = position in m
+        pend_pos = position in m
+    Keepalive = "keepalive" (or TCP keepalive)
+	Sent at 1 Hz
+
+===============
+Log File Format
+===============
+Time:Log_Level:Filename:Line:Message
+    Time = Processor time in HH:MM:SS.ssss
+    Log_Level = 1..3
+        1 = Fatal
+        2 = Warning
+        3 = Info
+    Filename = string, 15 printable chars
+    Line = number, 5 digits
+    Message = string, 255 printable chars
+
+    
+================        
+Data File Format
+================        
+CSV file
+1 record at 100 Hz
+    Time, Mode, PosCmd, CartPos, CartVel, PendPos, PendVel, ForceCmd
+
+    
+=====================
+Cart Sensor Interface
+=====================
+Binary messages
+    Header, Type, Length, Data
+        Header = 0xaa
+        Type = 1 byte as defined below
+        Length = Number of bytes in Data section
+        Data = Variable number of bytes as defined below
+        All data network order
+Message Type Definitions
+    ForceCmdMsg
+        Type = 0x10
+        Data = ForceCmd (double, N)
+    CartDataMsg
+        Type = 0x11
+        Data = CartPos (double, m), CartVel (double, m/s)
+    PollCmdMsg
+        Type = 0x12
+        Data = none
+    LockCmdMsg
+        Type = 0x13
+        Data = LockCmd (byte, 1 = lock, 0 = unlock)
+    Keepalive (or TCP keepalive)
+	Type = 0xff
+	Data = none
+
+        
+=========================        
+Pendulum Sensor Interface
+=========================        
+Binary messages
+    Header, Type, Length, Data
+        Header = 0xaa
+        Type = 1 byte as defined below
+        Length = Number of bytes in Data section
+        Data = Variable number of bytes as defined below
+Message Type Definitions
+    PendDataMsg
+        Type = 0x20
+        Data = PendPos (int16, deg*2^16/360), PendVel (double, rad/s)
