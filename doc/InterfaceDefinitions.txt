@@ -67,8 +67,8 @@ Message Type Definitions
         Type = 0x13
         Data = LockCmd (byte, 1 = lock, 0 = unlock)
     Keepalive (or TCP keepalive)
-	Type = 0xff
-	Data = none
+        Type = 0xff
+        Data = none
 
         
 =========================        

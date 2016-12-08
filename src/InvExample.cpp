@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     vector<uint8_t> bad_data{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), sizeof(double), 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };           // missing 1st byte
     vector<uint8_t> cart_data{ 0xaa, static_cast<uint8_t>(PacketId::CART_DATA), 2 * sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD, 0x40, 0x09, 0x21, 0xFB, 0x4D, 0x12, 0xD8, 0x4A };  // -123.45, 3.1415926
 
-    auto msg1 = CartForceCmd(force_cmd, InvTimestamp());
+    auto msg1 = CartForceCmdPacket(force_cmd, InvTimestamp());
 
     //cout << "Force Cmd, Force = " << msg1.Force << ", Timestamp = " << msg1.GetToa() << endl;
 
