@@ -13,24 +13,45 @@ namespace inv_example {
 // Convert double to a network-order vector of bytes
 // assumes host is little-endian
 // returns pointer to next available data byte
-vector<uint8_t>::iterator double_to_bytes(vector<uint8_t>::iterator pdest, double d)
+vector<uint8_t>::iterator convert_to_bytes_double(vector<uint8_t>::iterator pdest, double d, double max, double min, double scale)
 {
     union {
         double d;
         uint8_t v[sizeof(double)];
     } conv;
 
-    conv.d = d;
-    vector<uint8_t> out(sizeof(double));
+    d = std::min(d, max);
+    d = std::max(d, min);
+    conv.d = d / scale;             // convert double to raw
     reverse_copy(conv.v, &conv.v[sizeof(conv.v)], pdest);
 
-    return pdest + sizeof(double);
+    return pdest + sizeof(conv.v);
+}
+
+// Convert signed 16-bit int to a network-order vector of bytes
+// assumes host is little-endian
+// returns pointer to next available data byte
+vector<uint8_t>::iterator convert_to_bytes_i16(vector<uint8_t>::iterator pdest, double d, double max, double min, double scale)
+{
+    union {
+        int16_t  d;
+        uint8_t v[sizeof(int16_t)];
+    } conv;
+
+    d = std::min(d, max);
+    d = std::min(d, static_cast<double>(INT16_MAX));
+    d = std::max(d, min);
+    d = std::max(d, static_cast<double>(INT16_MIN));
+    conv.d = static_cast<int16_t>(d / scale);
+    reverse_copy(conv.v, &conv.v[sizeof(conv.v)], pdest);
+
+    return pdest + sizeof(conv.v);
 }
 
 // Convert an array of bytes in network order to a double
 // assumes host is little-endian
 // returns decoded double and pointer to the next data byte
-pair<double, vector<uint8_t>::const_iterator> bytes_to_double(vector<uint8_t>::const_iterator p)
+pair<double, vector<uint8_t>::const_iterator> bytes_to_double(vector<uint8_t>::const_iterator p, double max, double min, double scale)
 {
     union {
         double d;
@@ -38,11 +59,31 @@ pair<double, vector<uint8_t>::const_iterator> bytes_to_double(vector<uint8_t>::c
     } conv;
 
     reverse_copy(p, p + sizeof(conv.v), conv.v);
-    return make_pair(conv.d, p += sizeof(conv.v));
+    double dout = conv.d * scale;
+    dout = std::min(dout, max);
+    dout = std::max(dout, min);
+    return make_pair(dout, p += sizeof(conv.v));
+}
+
+// Convert an array of bytes in network order to a signed 16-bit int
+// assumes host is little-endian
+// returns decoded int and pointer to the next data byte
+pair<int16_t, vector<uint8_t>::const_iterator> bytes_to_i16(vector<uint8_t>::const_iterator p, double max, double min, double scale)
+{
+    union {
+        int16_t d;
+        uint8_t v[sizeof(int16_t)];
+    } conv;
+
+    reverse_copy(p, p + sizeof(conv.v), conv.v);
+    double dout = conv.d * scale;
+    dout = std::min(dout, max);
+    dout = std::max(dout, min);
+    return make_pair(conv.d, p += sizeof(conv.v));      // implicit cast
 }
 
 // ================================================================================
-// Message Parser implementation
+// Communication Packet Parser implementation
 // ================================================================================
 // ========================================
 // Lookup table of valid msg length vs msg ID
@@ -105,49 +146,117 @@ InvPacket::InvPacket(PacketId id)
 // Cart Force Cmd
 // ========================================
 // decode the data from received bytes
-CartForceCmd::CartForceCmd(std::vector<uint8_t> packet, InvTimestamp toa)
-: InvPacket(packet, toa)
+CartForceCmdPacket::CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa)
+    : InvPacket(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::FORCE_CMD) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
     }
     // parse data members
-    m_force = bytes_to_double(get_data()).first;
+    m_force = bytes_to_double(get_data(), m_MAX_FORCE, m_MIN_FORCE, m_SCALE_FORCE).first;
 }
 
 
 // encode a packet from data
-CartForceCmd::CartForceCmd(double force)
-: m_force(force), InvPacket(PacketId::FORCE_CMD)
+CartForceCmdPacket::CartForceCmdPacket(double force)
+    : m_force(force), InvPacket(PacketId::FORCE_CMD)
 {
-    double_to_bytes(get_data(), force);
+    convert_to_bytes_double(get_data(), m_force, m_MAX_FORCE, m_MIN_FORCE, m_SCALE_FORCE);
 }
 
 
 // ========================================
-// Cart Data Msg
+// Cart Data Packet
 // ========================================
 // decode the data from received bytes
-CartDataMsg::CartDataMsg(std::vector<uint8_t> packet, InvTimestamp toa)
-: InvPacket(packet, toa)
+CartDataPacket::CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
+    : InvPacket(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::CART_DATA) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
     }
     // parse data members
     vector<uint8_t>::const_iterator p = get_data();    // point to start of data
-    tie(m_pos, p) = bytes_to_double(p);
-    tie(m_vel, p) = bytes_to_double(p);
+    tie(m_pos, p) = bytes_to_double(p, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
+    tie(m_vel, p) = bytes_to_double(p, m_MAX_VEL, m_MIN_VEL, m_SCALE_VEL);
 }
 
 
 // encode a packet from data
-CartDataMsg::CartDataMsg(double cart_pos, double cart_vel)
-: m_pos(cart_pos), m_vel(cart_vel), InvPacket(PacketId::CART_DATA)
+CartDataPacket::CartDataPacket(double cart_pos, double cart_vel)
+    : m_pos(cart_pos), m_vel(cart_vel), InvPacket(PacketId::CART_DATA)
 {
     auto p = get_data();      // point to start of data
-    p = double_to_bytes(p, cart_pos);
-    p = double_to_bytes(p, cart_vel);
+    p = convert_to_bytes_double(p, m_pos, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
+    p = convert_to_bytes_double(p, m_vel, m_MAX_VEL, m_MIN_VEL, m_SCALE_VEL);
+}
+
+
+// ========================================
+// Cart Poll Cmd Packet
+// ========================================
+// decode the data from received bytes
+CartPollCmdPacket::CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa)
+    : InvPacket(packet, toa)
+{
+    if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::POLL_CMD) {
+        throw NewInvError(InvErrorCode::INVALID_MSG);
+    }
+    // no data members
+}
+
+
+// encode a packet from data
+CartPollCmdPacket::CartPollCmdPacket()
+    : InvPacket(PacketId::POLL_CMD)
+{
+    // no data
+}
+
+
+// ========================================
+// Cart Keepalive Cmd Packet
+// ========================================
+// decode the data from received bytes
+CartKeepaliveCmdPacket::CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa)
+    : InvPacket(packet, toa)
+{
+    if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::KEEPALIVE_CMD) {
+        throw NewInvError(InvErrorCode::INVALID_MSG);
+    }
+    // no data members
+}
+
+
+// encode a packet from data
+CartKeepaliveCmdPacket::CartKeepaliveCmdPacket()
+    : InvPacket(PacketId::KEEPALIVE_CMD)
+{
+    // no data
+}
+
+
+// ========================================
+// Pendulum Data Packet
+// ========================================
+// decode the data from received bytes
+PendDataPacket::PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
+    : InvPacket(packet, toa)
+{
+    if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::PEND_DATA) {
+        throw NewInvError(InvErrorCode::INVALID_MSG);
+    }
+    // parse data members
+    vector<uint8_t>::const_iterator p = get_data();            // points to start of data
+    tie(m_pos, p) = bytes_to_i16(p, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
+}
+
+
+// encode a packet from data
+PendDataPacket::PendDataPacket(double pos)
+    : m_pos(pos), InvPacket(PacketId::PEND_DATA)
+{
+    convert_to_bytes_i16(get_data(), m_pos, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
 }
 
 } // namespace inv_example

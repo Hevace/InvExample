@@ -89,35 +89,89 @@ private: // data
 
 
 // ========================================
-// Cart Force Cmd
+// Cart Force Cmd Packet
 // ========================================
-class CartForceCmd : public InvPacket
+class CartForceCmdPacket : public InvPacket
 {
 public: // constructors
-    CartForceCmd(std::vector<uint8_t> packet, InvTimestamp toa); // decode the data from received bytes
-    CartForceCmd(double force);                                  // encode a packet from data
-    CartForceCmd() = delete;                                     // cannot construct empty message
+    CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa); // decode the data from received bytes
+    CartForceCmdPacket(double force);                                  // encode a packet from data
+    CartForceCmdPacket() = delete;                                     // cannot construct empty message
 
 public: // data
     // packet contents data
     double m_force;       // cart force, N
+
+    // data conversion factors and limits
+    const double m_MAX_FORCE = DBL_MAX;         // N
+    const double m_MIN_FORCE = DBL_MIN;         // N
+    const double m_SCALE_FORCE = 1.0;           // raw to N
 };
 
 
 // ========================================
-// Cart Data Msg
+// Cart Data Packet
 // ========================================
-class CartDataMsg : public InvPacket
+class CartDataPacket : public InvPacket
 {
 public: // constructors
-    CartDataMsg(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
-    CartDataMsg(double cart_pos, double cart_vel);               // encode a packet from data
-    CartDataMsg() = delete;                                      // cannot construct empty message
+    CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
+    CartDataPacket(double cart_pos, double cart_vel);               // encode a packet from data
+    CartDataPacket() = delete;                                      // cannot construct empty message
 
 public: // data
     // message data
     double m_pos;         // cart position, m
     double m_vel;         // cart speed, m/s
+
+    // data conversion factors and limits
+    const double m_MAX_POS = DBL_MAX;           // m
+    const double m_MIN_POS = DBL_MIN;           // m
+    const double m_SCALE_POS = 1.0;             // raw to m
+    const double m_MAX_VEL = DBL_MAX;           // m/s
+    const double m_MIN_VEL = DBL_MIN;           // m/s
+    const double m_SCALE_VEL = 1.0;             // raw to m/s
+};
+
+
+// ========================================
+// Cart Poll Cmd Packet
+// ========================================
+class CartPollCmdPacket : public InvPacket
+{
+public: // constructors
+    CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
+    CartPollCmdPacket();                                               // encode a packet from data
+};
+
+
+// ========================================
+// Cart Keepalive Cmd Packet
+// ========================================
+class CartKeepaliveCmdPacket : public InvPacket
+{
+public: // constructors
+    CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
+    CartKeepaliveCmdPacket();                                               // encode a packet from data
+};
+
+
+// ========================================
+// Pendulum Data Packet
+// ========================================
+class PendDataPacket: public InvPacket
+{
+public: // constructors
+    PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
+    PendDataPacket(double pos);                                     // encode a packet from data
+
+public: // data
+    double m_pos;           // pendulum position, deg
+
+    // conversion factor and limits
+    const double m_SCALE_POS = 360.0 / 65536.0;         // raw to deg
+    const double m_MAX_POS = INT16_MAX * m_SCALE_POS;   // deg
+    const double m_MIN_POS = INT16_MIN * m_SCALE_POS;   // deg
 };
 
 } // namespace inv_example
