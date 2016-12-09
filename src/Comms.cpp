@@ -129,7 +129,7 @@ bool InvCommParser::validate_packet(std::vector<uint8_t> packet)
 // ========================================
 // Create message template with ID and correct length
 // ========================================
-InvPacket::InvPacket(PacketId id)
+CommPacketBase::CommPacketBase(PacketId id)
 {
     m_raw.clear();
     m_raw.push_back(InvCommParser::m_HEADER);
@@ -147,7 +147,7 @@ InvPacket::InvPacket(PacketId id)
 // ========================================
 // decode the data from received bytes
 CartForceCmdPacket::CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa)
-    : InvPacket(packet, toa)
+    : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::FORCE_CMD) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
@@ -159,7 +159,7 @@ CartForceCmdPacket::CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp
 
 // encode a packet from data
 CartForceCmdPacket::CartForceCmdPacket(double force)
-    : m_force(force), InvPacket(PacketId::FORCE_CMD)
+    : m_force(force), CommPacketBase(PacketId::FORCE_CMD)
 {
     convert_to_bytes_double(get_data(), m_force, m_MAX_FORCE, m_MIN_FORCE, m_SCALE_FORCE);
 }
@@ -170,7 +170,7 @@ CartForceCmdPacket::CartForceCmdPacket(double force)
 // ========================================
 // decode the data from received bytes
 CartDataPacket::CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
-    : InvPacket(packet, toa)
+    : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::CART_DATA) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
@@ -184,7 +184,7 @@ CartDataPacket::CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
 
 // encode a packet from data
 CartDataPacket::CartDataPacket(double cart_pos, double cart_vel)
-    : m_pos(cart_pos), m_vel(cart_vel), InvPacket(PacketId::CART_DATA)
+    : m_pos(cart_pos), m_vel(cart_vel), CommPacketBase(PacketId::CART_DATA)
 {
     auto p = get_data();      // point to start of data
     p = convert_to_bytes_double(p, m_pos, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
@@ -197,7 +197,7 @@ CartDataPacket::CartDataPacket(double cart_pos, double cart_vel)
 // ========================================
 // decode the data from received bytes
 CartPollCmdPacket::CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa)
-    : InvPacket(packet, toa)
+    : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::POLL_CMD) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
@@ -208,7 +208,7 @@ CartPollCmdPacket::CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp t
 
 // encode a packet from data
 CartPollCmdPacket::CartPollCmdPacket()
-    : InvPacket(PacketId::POLL_CMD)
+    : CommPacketBase(PacketId::POLL_CMD)
 {
     // no data
 }
@@ -219,7 +219,7 @@ CartPollCmdPacket::CartPollCmdPacket()
 // ========================================
 // decode the data from received bytes
 CartKeepaliveCmdPacket::CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa)
-    : InvPacket(packet, toa)
+    : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::KEEPALIVE_CMD) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
@@ -230,7 +230,7 @@ CartKeepaliveCmdPacket::CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvT
 
 // encode a packet from data
 CartKeepaliveCmdPacket::CartKeepaliveCmdPacket()
-    : InvPacket(PacketId::KEEPALIVE_CMD)
+    : CommPacketBase(PacketId::KEEPALIVE_CMD)
 {
     // no data
 }
@@ -241,7 +241,7 @@ CartKeepaliveCmdPacket::CartKeepaliveCmdPacket()
 // ========================================
 // decode the data from received bytes
 PendDataPacket::PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
-    : InvPacket(packet, toa)
+    : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::PEND_DATA) {
         throw NewInvError(InvErrorCode::INVALID_MSG);
@@ -254,7 +254,7 @@ PendDataPacket::PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
 
 // encode a packet from data
 PendDataPacket::PendDataPacket(double pos)
-    : m_pos(pos), InvPacket(PacketId::PEND_DATA)
+    : m_pos(pos), CommPacketBase(PacketId::PEND_DATA)
 {
     convert_to_bytes_i16(get_data(), m_pos, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
 }

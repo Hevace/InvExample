@@ -71,12 +71,14 @@
   <ItemGroup>
     <ClInclude Include="..\..\src\Comms.h" />
     <ClInclude Include="..\..\src\Error.h" />
+    <ClInclude Include="..\..\src\Ipc.h" />
     <ClInclude Include="..\..\src\Timestamp.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\Comms.cpp" />
     <ClCompile Include="..\..\src\Error.cpp" />
     <ClCompile Include="..\..\src\InvExample.cpp" />
+    <ClCompile Include="..\..\src\Ipc.cpp" />
     <ClCompile Include="..\..\src\Timestamp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

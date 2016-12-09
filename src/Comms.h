@@ -25,7 +25,7 @@ enum class PacketId {                      // message types
     PEND_DATA = 0x20,
 };
 
-class InvPacket;
+class CommPacketBase;
 // ========================================
 // Communications packet parser state machine
 // ========================================
@@ -35,8 +35,8 @@ public: // constructors
     InvCommParser() : m_state(ParserState::HEADER) {};
 
 public: // methods
-    bool next(uint8_t b);                                 // parse the next byte, return true if a msg is ready
-    InvPacket get_next_packet(void);                      // return the latest valid message
+    bool next(uint8_t b);                                 // TODO: // parse the next byte, return true if a msg is ready
+    CommPacketBase get_next_packet(void);                      // TODO: // return the latest valid message
 
     // static methods for message creation and validation
     static unsigned int lookup_data_len(PacketId id);          // look up the length of the data part of the message given an ID
@@ -67,13 +67,13 @@ private: // data
 // ========================================
 // Communications packet base class
 // ========================================
-class InvPacket
+class CommPacketBase
 {
 protected: // constructors
     // Create a new packet with raw received message bytes and the time when the first byte was received
-    InvPacket(std::vector<uint8_t> packet, InvTimestamp toa) : m_raw(packet), m_toa(toa) {};
+    CommPacketBase(std::vector<uint8_t> packet, InvTimestamp toa) : m_raw(packet), m_toa(toa) {};
     // Create a new outgoing packet template with ID and correct length
-    InvPacket(PacketId id);
+    CommPacketBase(PacketId id);
 
 public: // methods
     unsigned int get_header(void) { return m_raw[0]; };                 // get the message header
@@ -91,7 +91,7 @@ private: // data
 // ========================================
 // Cart Force Cmd Packet
 // ========================================
-class CartForceCmdPacket : public InvPacket
+class CartForceCmdPacket : public CommPacketBase
 {
 public: // constructors
     CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa); // decode the data from received bytes
@@ -104,7 +104,7 @@ public: // data
 
     // data conversion factors and limits
     const double m_MAX_FORCE = DBL_MAX;         // N
-    const double m_MIN_FORCE = DBL_MIN;         // N
+    const double m_MIN_FORCE = -DBL_MAX;        // N
     const double m_SCALE_FORCE = 1.0;           // raw to N
 };
 
@@ -112,7 +112,7 @@ public: // data
 // ========================================
 // Cart Data Packet
 // ========================================
-class CartDataPacket : public InvPacket
+class CartDataPacket : public CommPacketBase
 {
 public: // constructors
     CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
@@ -126,10 +126,10 @@ public: // data
 
     // data conversion factors and limits
     const double m_MAX_POS = DBL_MAX;           // m
-    const double m_MIN_POS = DBL_MIN;           // m
+    const double m_MIN_POS = -DBL_MAX;          // m
     const double m_SCALE_POS = 1.0;             // raw to m
     const double m_MAX_VEL = DBL_MAX;           // m/s
-    const double m_MIN_VEL = DBL_MIN;           // m/s
+    const double m_MIN_VEL = -DBL_MAX;          // m/s
     const double m_SCALE_VEL = 1.0;             // raw to m/s
 };
 
@@ -137,7 +137,7 @@ public: // data
 // ========================================
 // Cart Poll Cmd Packet
 // ========================================
-class CartPollCmdPacket : public InvPacket
+class CartPollCmdPacket : public CommPacketBase
 {
 public: // constructors
     CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
@@ -148,7 +148,7 @@ public: // constructors
 // ========================================
 // Cart Keepalive Cmd Packet
 // ========================================
-class CartKeepaliveCmdPacket : public InvPacket
+class CartKeepaliveCmdPacket : public CommPacketBase
 {
 public: // constructors
     CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
@@ -159,7 +159,7 @@ public: // constructors
 // ========================================
 // Pendulum Data Packet
 // ========================================
-class PendDataPacket: public InvPacket
+class PendDataPacket: public CommPacketBase
 {
 public: // constructors
     PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa);  // decode the data from received bytes
