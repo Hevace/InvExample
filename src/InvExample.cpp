@@ -6,11 +6,13 @@
 #include <iostream>
 #include "comms.h"
 #include "timestamp.h"
+#include "ipc.h"
 
 #include <iomanip>
 #include <ctime>
 #include <chrono>
 #include <string>
+#include <memory>
 
 using namespace std;
 using namespace inv_example;
@@ -23,46 +25,27 @@ int main(int argc, char *argv[])
     vector<uint8_t> bad_data{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), sizeof(double), 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };           // missing 1st byte
     vector<uint8_t> cart_data{ 0xaa, static_cast<uint8_t>(PacketId::CART_DATA), 2 * sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD, 0x40, 0x09, 0x21, 0xFB, 0x4D, 0x12, 0xD8, 0x4A };  // -123.45, 3.1415926
 
-    auto msg1 = CartForceCmdPacket(force_cmd, InvTimestamp());
+    auto msg = CartForceCmdPacket(force_cmd, InvTimestamp());
+    cout << "Force Cmd, Force = " << msg.m_force << ", Timestamp = " << msg.get_toa() << endl;
+    cout << endl;
 
-    //cout << "Force Cmd, Force = " << msg1.Force << ", Timestamp = " << msg1.GetToa() << endl;
+    cout << "Timestamp" << endl;
+    auto ts = InvTimestamp();
+    cout << ts << endl;
+    cout << endl;
 
-    cout << "Steady Clock" << endl;
-    cout << "min " << chrono::steady_clock::duration::min().count()
-        << ", max " << chrono::steady_clock::duration::max().count()
-        << ", " << (chrono::treat_as_floating_point<chrono::steady_clock::duration>::value ? "FP" : "integer") << endl;
-    cout << (chrono::steady_clock::is_steady ? "steady" : "not steady") << endl;
-    cout << (chrono::steady_clock::is_monotonic ? "monotonic" : "not monotonic") << endl;
+    cout << "Queue" << endl;
+    IpcQueue<IpcMsg> q;
+    IpcMsg1Data msg1_data;
+    msg1_data.i1 = 1;
+    msg1_data.i2 = 2;
+    IpcMsg msg1(1, msg1_data);
+    q.Send(msg1);
+    auto msg_out = q.Wait();
+    auto msg_out_data = msg_out.GetMsg1Data();
+    cout << "Sent " << msg1_data.i1 << "," << msg1_data.i1 << endl;
+    cout << "Rcvd " << msg_out_data->i1 << "," << msg_out_data->i2 << endl;
 
-      auto t1 = chrono::steady_clock::now();
-      auto t2 = chrono::steady_clock::now();
-      while (t2 == t1) t2 = chrono::steady_clock::now();
-      auto int_ms = chrono::duration_cast<chrono::milliseconds>(t2 - t1);
-      chrono::duration<double, milli> fp_ms = t2 - t1;
-      cout << fp_ms.count() << " ms, " << int_ms.count() << " whole ms" << endl;
-
-      chrono::duration<double, milli> fp_ms2 = t1.time_since_epoch();
-      double frac = fp_ms2.count() - floor(fp_ms2.count());
-
-      auto tnow = chrono::steady_clock::to_time_t(chrono::steady_clock::now());
-      tm tmnow;
-      localtime_s(&tmnow, &tnow);
-      cout << "Now: " << put_time(&tmnow, "%c") << endl;
-      cout << endl;
-
-      cout << "Windows File Time" << endl;
-      FILETIME filetime1, filetime2;
-      GetSystemTimeAsFileTime(&filetime1);
-      filetime2 = filetime1;
-      while (filetime1.dwLowDateTime == filetime2.dwLowDateTime) GetSystemTimeAsFileTime(&filetime2);
-      cout << "High Diff: " << filetime2.dwHighDateTime - filetime1.dwHighDateTime << endl;
-      cout << "Low Diff: " << filetime2.dwLowDateTime - filetime1.dwLowDateTime << endl;
-      cout << endl;
-
-      cout << "Timestamp" << endl;
-      auto ts = InvTimestamp();
-      cout << ts.to_string() << endl;
-      cout << ts << endl;
 
     return 0;
 }
