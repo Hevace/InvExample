@@ -32,13 +32,13 @@ class IpcMsg
 {
 public: // constructor
     IpcMsg(IpcMsgId id) : m_id{ id } {};
-    IpcMsg(IpcMsgId id, IpcMsg1Data &msg1data);
-    IpcMsg(IpcMsgId id, IpcMsg2Data &msg2data);
+    IpcMsg(IpcMsgId id, IpcMsg1Data &msg1data) : m_id{ id } { m_data.msg1data = msg1data; };
+    IpcMsg(IpcMsgId id, IpcMsg2Data &msg2data) : m_id{ id } { m_data.msg2data = msg2data; };
     IpcMsg() = delete;                  // must provide id and data
 public: // methods
     IpcMsgId GetId() { return m_id; };
-    IpcMsg1Data* GetMsg1Data();
-    IpcMsg2Data* GetMsg2Data();
+    IpcMsg1Data* GetMsg1Data() { return &m_data.msg1data; };
+    IpcMsg2Data* GetMsg2Data() { return &m_data.msg2data; };
 private: // data
     IpcMsgId m_id;                           // message id
     union {
