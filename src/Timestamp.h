@@ -20,7 +20,11 @@ public: // constructors
 
 public: // methods
     // formatted output
-    std::string to_string(void) const;             // Short string HH:MM:SS.sss in local time zone
+    std::string to_string(void) const;             // Short string HH:MM:SS.ssss in local time zone
+    std::chrono::steady_clock::duration to_duration(const InvTimestamp& t0) const { return m_t - t0.m_t; }; // difference as a duration
+
+    // operators
+    double operator-(const InvTimestamp &t0) { return std::chrono::duration<double, std::ratio<1, 1>>(to_duration(t0)).count(); }; // difference in seconds
 
 private: // data
     std::chrono::steady_clock::time_point m_t;      // timestamp stored in the std library type

@@ -16,8 +16,9 @@ namespace inv_example {
 // each code corresponds to an entry in the Error Table
 // ========================================
 enum class InvErrorCode {
-    NO_ERROR = 0,
-    INVALID_MSG
+    NONE = 0,
+    INVALID_MSG,                    // invalid serial message
+    RESOURCE_ALLOCATION_FAILED,     // class constructor failed
 };
 
 
@@ -25,7 +26,7 @@ enum class InvErrorCode {
 // Error Levels
 // ========================================
 enum class InvErrorLevel {
-    NO_ERROR = 0,
+    NONE = 0,
     FATAL = 1,     // the program will terminate
     WARNING = 2,   // something wrong but program continues
     INFO = 3       // informational, not necessarily a problem

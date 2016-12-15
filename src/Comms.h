@@ -13,7 +13,7 @@ namespace inv_example {
 // ========================================
 // Communications packet type definitions
 // ========================================
-enum class PacketId {                      // message types
+enum PacketId {                      // message types
     // Cart interface messages
     FORCE_CMD = 0x10,
     CART_DATA = 0x11,

@@ -7,6 +7,7 @@
 #include "comms.h"
 #include "timestamp.h"
 #include "ipc.h"
+#include "Error.h"
 
 #include <iomanip>
 #include <ctime>
@@ -16,6 +17,16 @@
 
 using namespace std;
 using namespace inv_example;
+
+namespace inv_example {
+void entry_point(void);       // system initialization and main loop
+}
+
+int dbg_count = 0;
+void dbg_callback(void)
+{
+    dbg_count++;
+}
 
 int main(int argc, char *argv[])
 {
@@ -34,18 +45,14 @@ int main(int argc, char *argv[])
     cout << ts << endl;
     cout << endl;
 
-    cout << "Queue" << endl;
-    IpcQueue<IpcMsg> q;
-    IpcMsg1Data msg1_data;
-    msg1_data.i1 = 1;
-    msg1_data.i2 = 2;
-    IpcMsg msg1(1, msg1_data);
-    q.Send(msg1);
-    auto msg_out = q.Wait();
-    auto msg_out_data = msg_out.GetMsg1Data();
-    cout << "Sent " << msg1_data.i1 << "," << msg1_data.i1 << endl;
-    cout << "Rcvd " << msg_out_data->i1 << "," << msg_out_data->i2 << endl;
+    IpcHighResTimer hrt(10, dbg_callback);
 
+    entry_point();
+
+    cout << "dbg_count " << dbg_count << endl;
+    auto tend = InvTimestamp();
+    cout << tend << endl;
+    cout << "elapsed " << tend - ts << endl;
 
     return 0;
 }

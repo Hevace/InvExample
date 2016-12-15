@@ -27,11 +27,11 @@
     <ClInclude Include="..\..\src\Ipc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\Messages.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\InvExample.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\Comms.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -41,7 +41,13 @@
     <ClCompile Include="..\..\src\Timestamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\Ipc.cpp">
+    <ClCompile Include="..\..\src\WinMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\WinIpc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
