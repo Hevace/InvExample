@@ -10,8 +10,9 @@ namespace inv_example {
 // Error Table
 // ========================================
 const map<InvErrorCode, InvErrorInfo> InvError::ErrorTable = {
-    { InvErrorCode::NO_ERROR, { InvErrorLevel::NO_ERROR, "No Error" } },
+    { InvErrorCode::NONE, { InvErrorLevel::NONE, "No Error" } },
     { InvErrorCode::INVALID_MSG, { InvErrorLevel::FATAL, "Unable to decode a parsed message" } },
+    { InvErrorCode::RESOURCE_ALLOCATION_FAILED, { InvErrorLevel::FATAL, "Unable to create or allocate a resource" } }
 };
 
 

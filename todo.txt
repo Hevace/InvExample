@@ -1,4 +1,4 @@
-[ ] Don't use exceptions for application errors and warnings
+[ ] Don't use exceptions for application errors and warnings. Create error type for exceptions that includes exception text.
 [ ] Separate Comm Messages from in-app messages
 [ ] Separate platform dependencies, starting with the timestamp (subclass for each platform)
 [ ] Implement Comm packet parser
