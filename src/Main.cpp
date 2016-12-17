@@ -107,7 +107,7 @@ void main_loop(void)
         while (m.first) {
             // TODO log errors to file
             // TODO display errors on console
-            cout << g_sys_err_table.to_string(*m.second) << endl;
+            cout << g_sys_err_table.to_string(*m.second) << endl;       // DEBUG
 
             // quit on a fatal error
             if (g_sys_err_table.LookupErrorLevel(*m.second) == InvErrorLevel::FATAL) {
