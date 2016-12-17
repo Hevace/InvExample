@@ -38,4 +38,4 @@ std::string InvTimestamp::to_string(void) const
 // ========================================
 // output formatted timestamp to a stream
 // ========================================
-std::ostream& operator<<(std::ostream& os, const inv_example::InvTimestamp& timestamp) { os << timestamp.to_string().c_str(); return os; };
+std::ostream& operator<<(std::ostream& os, const inv_example::InvTimestamp& timestamp) { os << timestamp.to_string(); return os; };

@@ -1,6 +1,7 @@
 // Implementation of interface messages
 
 #include <algorithm>
+#include "System.h"
 #include "comms.h"
 #include "error.h"
 
@@ -150,7 +151,7 @@ CartForceCmdPacket::CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::FORCE_CMD) {
-        throw NewInvError(InvErrorCode::INVALID_MSG);
+        throw NewInvError(SYSERR_CART_FORCE_MSG_PARSE);
     }
     // parse data members
     m_force = bytes_to_double(get_data(), m_MAX_FORCE, m_MIN_FORCE, m_SCALE_FORCE).first;
@@ -173,7 +174,7 @@ CartDataPacket::CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::CART_DATA) {
-        throw NewInvError(InvErrorCode::INVALID_MSG);
+        throw NewInvError(SYSERR_CART_DATA_MSG_PARSE);
     }
     // parse data members
     vector<uint8_t>::const_iterator p = get_data();    // point to start of data
@@ -200,7 +201,7 @@ CartPollCmdPacket::CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp t
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::POLL_CMD) {
-        throw NewInvError(InvErrorCode::INVALID_MSG);
+        throw NewInvError(SYSERR_CART_POLL_MSG_PARSE);
     }
     // no data members
 }
@@ -222,7 +223,7 @@ CartKeepaliveCmdPacket::CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvT
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::KEEPALIVE_CMD) {
-        throw NewInvError(InvErrorCode::INVALID_MSG);
+        throw NewInvError(SYSERR_CART_KEEPALIVE_MSG_PARSE);
     }
     // no data members
 }
@@ -244,7 +245,7 @@ PendDataPacket::PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::PEND_DATA) {
-        throw NewInvError(InvErrorCode::INVALID_MSG);
+        throw NewInvError(SYSERR_PEND_DATA_MSG_PARSE);
     }
     // parse data members
     vector<uint8_t>::const_iterator p = get_data();            // points to start of data

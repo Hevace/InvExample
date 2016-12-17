@@ -45,7 +45,19 @@ int main(int argc, char *argv[])
     cout << ts << endl;
     cout << endl;
 
-    IpcHighResTimer hrt(10, dbg_callback);
+    try {
+        IpcHighResTimer hrt(10, dbg_callback);
+    }
+    catch (InvError e) {
+        cout << "High Res Timer Error" << endl;
+        cout << e << endl;
+    }
+    catch (exception e) {
+        cout << "High Res Timer System Error" << endl;
+        cout << e.what() << endl;
+        auto local_error = NewInvErrorException(e);
+        cout << local_error << endl;
+    }
 
     entry_point();
 

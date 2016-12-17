@@ -18,9 +18,10 @@ template <typename T>
 class IpcQueue
 {
 public: // methods
-    void Send(T& msg);     // enqueue the message
-    bool Try();            // return true if a message is available
-    T Wait();              // wait for a message to become available
+    void Send(T& msg);                  // enqueue the message
+    bool Try(void);                     // return true if a message is available
+    T Wait(void);                       // wait for a message to become available
+    std::pair<bool, std::unique_ptr<T>> TryGet(void);    // return <true,entry> if one is available, otherwise return <false,nullptr>
 private: // data
     std::queue<T> m_q;
     std::condition_variable m_cond;
@@ -39,7 +40,7 @@ void IpcQueue<T>::Send(T& msg)
 
 // return true if a message is available
 template <typename T>
-bool IpcQueue<T>::Try()
+bool IpcQueue<T>::Try(void)
 {
     std::unique_lock<std::mutex> lock{ m_mtx };
     return !m_q.empty();
@@ -48,12 +49,28 @@ bool IpcQueue<T>::Try()
 
 // wait for a message to become available
 template <typename T>
-T IpcQueue<T>::Wait()
+T IpcQueue<T>::Wait(void)
 {
     std::unique_lock<std::mutex> lock{ m_mtx };
     m_cond.wait(lock, [this]{return !m_q.empty(); });    // keep waiting until queue is not empty
     auto msg = std::move(m_q.front());
     m_q.pop();
+    return msg;
+}
+
+
+// return a message without waiting
+template <typename T>
+std::pair<bool, std::unique_ptr<T>> IpcQueue<T>::TryGet(void)
+{
+    std::pair<bool, unique_ptr<T>> msg(false, nullptr);     // default return value
+
+    std::unique_lock<std::mutex> lock{ m_mtx };
+    if (!m_q.empty()) {
+        msg.first = true;                       // indicate the object is valid
+        msg.second.reset(new T(m_q.front()));   // get a pointer to a copy of the object pulled from the queue
+        m_q.pop();
+    }
     return msg;
 }
 
