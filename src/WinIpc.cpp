@@ -2,6 +2,7 @@
 
 #include <windows.h>
 
+#include "System.h"
 #include "Ipc.h"
 #include "Error.h"
 
@@ -22,19 +23,19 @@ IpcHighResTimer::IpcHighResTimer(unsigned int period_ms, IpcHighResTimerCallback
     TIMECAPS tc;
     MMRESULT mr = timeGetDevCaps(&tc, sizeof(TIMECAPS));
     if (mr) {
-        throw NewInvError(InvErrorCode::RESOURCE_ALLOCATION_FAILED);
+        throw NewInvError(SYSERR_RESOURCE_ALLOCATION_FAILED);
     }
     if (period_ms < tc.wPeriodMin || period_ms > tc.wPeriodMax) {
-        throw NewInvError(InvErrorCode::RESOURCE_ALLOCATION_FAILED);
+        throw std::invalid_argument("High Res Timer period out of range");
     }
     if (proc == nullptr) {
-        throw NewInvError(InvErrorCode::RESOURCE_ALLOCATION_FAILED);
+        throw std::invalid_argument("High Res Timer has a null callback");
     }
 
     m_proc = proc;
     m_timerid = timeSetEvent(period_ms, 0, win_timer_callback, reinterpret_cast<DWORD_PTR>(this), TIME_PERIODIC);
     if (m_timerid == NULL) {
-        throw NewInvError(InvErrorCode::RESOURCE_ALLOCATION_FAILED);
+        throw NewInvError(SYSERR_RESOURCE_ALLOCATION_FAILED);
     }
 }
 
