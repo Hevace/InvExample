@@ -75,6 +75,7 @@
     <ClInclude Include="..\..\src\Error.h" />
     <ClInclude Include="..\..\src\Ipc.h" />
     <ClInclude Include="..\..\src\Messages.h" />
+    <ClInclude Include="..\..\src\Model.h" />
     <ClInclude Include="..\..\src\System.h" />
     <ClInclude Include="..\..\src\Timestamp.h" />
   </ItemGroup>
