@@ -6,7 +6,7 @@
 
 #include <stdexcept>
 #include <map>
-#include "timestamp.h"
+#include "Timestamp.h"
 
 namespace inv_example {
 // ========================================

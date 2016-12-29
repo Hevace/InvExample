@@ -2,8 +2,8 @@
 
 #include <algorithm>
 #include "System.h"
-#include "comms.h"
-#include "error.h"
+#include "Comms.h"
+#include "Error.h"
 
 using namespace std;
 namespace inv_example {
