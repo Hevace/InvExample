@@ -2,26 +2,26 @@ SHELL = /bin/sh
 .SUFFIXES:
 .SUFFIXES: .c .cpp .o
 
-mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
-mkfile_dir := $(dir $(mkfile_path))
+MKFILE_PATH := $(abspath $(lastword $(MAKEFILE_LIST)))
+MKFILE_DIR := $(dir $(MKFILE_PATH))
 
 ########################################
 # Inputs
 ########################################
-SRCDIR := ../src
-INCLUDEDIR := ../src
+SRCDIR := $(MKFILE_DIR)../src
+INCLUDEDIR := $(MKFILE_DIR)../src
 SOURCES := hellotest.cpp
 
 ########################################
 # Intermediate directories
 ########################################
-OBJDIR := ./obj
+OBJDIR := $(MKFILE_DIR)obj
 OBJECTS := $(addprefix $(OBJDIR)/, $(notdir $(SOURCES:.cpp=.o)))
 
 ########################################
 # Output directories
 ########################################
-BUILDDIR := ../build
+BUILDDIR := $(MKFILE_DIR)../build
 
 VPATH := $(SRCDIR) $(INCLUDEDIR) $(OBJDIR) $(BUILDDIR)
 
@@ -36,7 +36,8 @@ LDFLAGS := -g
 # Automatic generation of dependency files
 ########################################
 $(OBJDIR)/%.d:%.cpp
-	rm -f $@; \
+	@echo 'Dependencies $(<F) ==> $(@F)'
+	@rm -f $@; \
 	$(CXX) -MM $(CXXFLAGS) $< > $@.$$$$; \
 	sed 's,\($*\)\.o[ :]*,\1.o $@ : ,g' < $@.$$$$ > $@; \
 	rm -f $@.$$$$
@@ -54,21 +55,25 @@ $(OBJDIR)/%.o:%.cpp
 all: $(BUILDDIR)/InvExample
 
 clean:
-	rm -r $(OBJDIR)
-	rm -r $(BUILDDIR)
+	rm -rf $(OBJDIR)
+	rm -rf $(BUILDDIR)
 
 $(BUILDDIR)/InvExample: $(OBJECTS) | $(BUILDDIR)
 	$(CXX) $(LDFLAGS) -o $@ $^
 
-$(OBJECTS) $(OBJECTS:.o=.d): | $(OBJDIR)        # Create the object dir before creating object files or dependency files
+# Create the object dir before creating object files or dependency files
+$(OBJECTS) $(OBJECTS:.o=.d): | $(OBJDIR)
 
+# Create the object dir if it doesn't exist
 $(OBJDIR):
-	mkdir $(OBJDIR)            # Create the object dir if it doesn't exist
+	mkdir $(OBJDIR)
 
+# Create the build dir if it doesn't exist
 $(BUILDDIR):
-	mkdir $(BUILDDIR)          # Create the build dir if it doesn't exist
+	mkdir $(BUILDDIR)
 
-include $(OBJECTS:.o=.d)    # include automatic header dependencies
+# include automatic header dependencies
+include $(OBJECTS:.o=.d)
 
 # print variable value for makefile debugging
 print-%:
