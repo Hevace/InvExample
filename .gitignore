@@ -9,3 +9,6 @@
 *.lastbuildstate
 *.idb
 *.user
+*.swp
+*.o
+*.d

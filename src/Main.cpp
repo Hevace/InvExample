@@ -2,13 +2,24 @@
 
 #include <iostream> // DEBUG
 #include <string> // DEBUG
+#include <iomanip> // DEBUG
+#include <ctime> // DEBUG
+#include <chrono> // DEBUG
+#include <string> // DEBUG
+#include <memory> // DEBUG
 
 #include "System.h"
 #include "Error.h"
 #include "Ipc.h"
 #include "Messages.h"
 
+// DEBUG includes for test code in main
+#include "Comms.h"    // DEBUG
+#include "Timestamp.h"    // DEBUG
+
+
 using namespace std;
+using namespace inv_example;
 
 namespace inv_example {
 // ================================================================================
@@ -84,13 +95,11 @@ void main_loop(void)
             break;
 
         case SysMode::HOLDING:
-            switch (msg.GetId()) {
-            case IpcMsgId::MSG_MOVE_CMD:
+            if (msg.GetId() == IpcMsgId::MSG_MOVE_CMD) {
                 mode = SysMode::MOVING;
-                break;
-            case IpcMsgId::MSG_RESET_CMD:
+            }
+            else if (msg.GetId() == IpcMsgId::MSG_RESET_CMD) {
                 mode = SysMode::LOCKED;
-                break;
             }
             break;
 
@@ -129,15 +138,65 @@ void system_init(void)
 
 }
 
+} // namespace inv_example
+
+
+// DEBUG dummy callback for testing timer
+int dbg_count = 0;
+void dbg_callback(void)
+{
+    dbg_count++;
+}
 
 // ================================================================================
 // Program entry point
 // initialization and main loop
 // ================================================================================
-void entry_point(void)
+int main(int argc, char *argv[])
 {
+    // DEBUG test code in main
+    vector<uint8_t> bad_length{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), 1 };
+    vector<uint8_t> bad_id{ 0xaa, 0xfe, 1, 0 };
+    vector<uint8_t> force_cmd{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };    // -123.45
+    vector<uint8_t> bad_data{ 0xaa, static_cast<uint8_t>(PacketId::FORCE_CMD), sizeof(double), 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD };           // missing 1st byte
+    vector<uint8_t> cart_data{ 0xaa, static_cast<uint8_t>(PacketId::CART_DATA), 2 * sizeof(double), 0xC0, 0x5E, 0xDC, 0xCC, 0xCC, 0xCC, 0xCC, 0xCD, 0x40, 0x09, 0x21, 0xFB, 0x4D, 0x12, 0xD8, 0x4A };  // -123.45, 3.1415926
+
+    auto msg = CartForceCmdPacket(force_cmd, InvTimestamp());
+    cout << "Force Cmd, Force = " << msg.m_force << ", Timestamp = " << msg.get_toa() << endl;
+    cout << endl;
+
+    cout << "Timestamp" << endl;
+    auto ts = InvTimestamp();
+    cout << ts << endl;
+    cout << endl;
+
+    try {
+        IpcHighResTimer hrt(10, dbg_callback);
+    }
+    catch (InvError e) {
+        cout << "High Res Timer Error" << endl;
+        cout << e << endl;
+    }
+    catch (exception e) {
+        cout << "High Res Timer System Error" << endl;
+        cout << e.what() << endl;
+        InvError local_error(e, __LINE__, __FILE__);
+        cout << local_error << endl;
+    }
+
+    // DEBUG add a test to print smallest timestamp increment
+
+    // Run the system
     system_init();
     main_loop();
+
+
+    // DEBUG test code in main
+    cout << "dbg_count " << dbg_count << endl;
+    auto tend = InvTimestamp();
+    cout << tend << endl;
+    cout << "elapsed " << tend - ts << endl;
+
+    return 0;
 }
 
-} // namespace inv_example

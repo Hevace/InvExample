@@ -10,7 +10,7 @@ MKFILE_DIR := $(dir $(MKFILE_PATH))
 ########################################
 SRCDIR := $(MKFILE_DIR)../src
 INCLUDEDIR := $(MKFILE_DIR)../src
-SOURCES := hellotest.cpp
+SOURCES := $(wildcard $(SRCDIR)/*.cpp)
 
 ########################################
 # Intermediate directories
@@ -28,9 +28,9 @@ VPATH := $(SRCDIR) $(INCLUDEDIR) $(OBJDIR) $(BUILDDIR)
 ########################################
 # Compiler options
 ########################################
-CDEBUG := -g
-CXXFLAGS := -I$(INCLUDEDIR) -std=c++11 -O2 -Wall $(CDEBUG)
+CXXFLAGS := -I$(INCLUDEDIR) -std=c++11 -g -O2 -Wall
 LDFLAGS := -g
+LDLIBS := -lpthread
 
 ########################################
 # Automatic generation of dependency files
@@ -59,7 +59,8 @@ clean:
 	rm -rf $(BUILDDIR)
 
 $(BUILDDIR)/InvExample: $(OBJECTS) | $(BUILDDIR)
-	$(CXX) $(LDFLAGS) -o $@ $^
+	@echo Linking
+	$(CXX) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 # Create the object dir before creating object files or dependency files
 $(OBJECTS) $(OBJECTS:.o=.d): | $(OBJDIR)
@@ -73,7 +74,7 @@ $(BUILDDIR):
 	mkdir $(BUILDDIR)
 
 # include automatic header dependencies
-include $(OBJECTS:.o=.d)
+-include $(OBJECTS:.o=.d)
 
 # print variable value for makefile debugging
 print-%:

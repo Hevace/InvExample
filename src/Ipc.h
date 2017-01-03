@@ -18,7 +18,7 @@ template <typename T>
 class IpcQueue
 {
 public: // methods
-    void Send(T& msg);                  // enqueue the message
+    void Send(const T& msg);            // enqueue the message
     bool Try(void);                     // return true if a message is available
     T Wait(void);                       // wait for a message to become available
     std::pair<bool, std::unique_ptr<T>> TryGet(void);    // return <true,entry> if one is available, otherwise return <false,nullptr>
@@ -30,7 +30,7 @@ private: // data
 
 // enqueue a message
 template <typename T>
-void IpcQueue<T>::Send(T& msg)
+void IpcQueue<T>::Send(const T& msg)
 {
     std::unique_lock<std::mutex> lock{ m_mtx };
     m_q.push(msg);
@@ -63,7 +63,7 @@ T IpcQueue<T>::Wait(void)
 template <typename T>
 std::pair<bool, std::unique_ptr<T>> IpcQueue<T>::TryGet(void)
 {
-    std::pair<bool, unique_ptr<T>> msg(false, nullptr);     // default return value
+    std::pair<bool, std::unique_ptr<T>> msg(false, nullptr);     // default return value
 
     std::unique_lock<std::mutex> lock{ m_mtx };
     if (!m_q.empty()) {
@@ -144,13 +144,19 @@ public: // constructors
 public: // methods
     void callback(void) { (*m_proc)(); };
 
+private: // methods
+    static void timer_thread(IpcHighResTimer *pthis);
+
 private: // data
     IpcHighResTimerCallback m_proc;         // pointer to callback function
     unsigned int m_timerid;                 // timer ID returned by windows
+    std::unique_ptr<std::thread> m_pthread;   // pointer to thread object
+    bool m_run = true;                      // thread is running
 };
 
 
 } // namespace inv_example
 
-#endif __IPC_H__
+#endif // __IPC_H__
+
 

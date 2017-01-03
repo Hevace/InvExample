@@ -42,9 +42,9 @@ enum class InvErrorLevel {
 class InvError : std::exception
 {
 public: // constructors
-    InvError::InvError(void) = delete;
+    InvError(void) = delete;
     // Construct an error report that can be queued or thrown as an exception
-    InvError::InvError(InvErrorCode code, int line, const std::string file)
+    InvError(InvErrorCode code, int line, const std::string file)
         : m_time(),             // time is now
         m_code(code),
         m_line(line),
@@ -53,7 +53,7 @@ public: // constructors
     {};
 
     // Construct an error report for an exception thrown by the std library
-    InvError::InvError(std::exception e, int line, const std::string file)
+    InvError(std::exception e, int line, const std::string file)
         : m_time(),             // time is now
         m_code(static_cast<InvErrorCode>(SpecialErrCode::EXCEPTION)),
         m_line(line),
@@ -113,13 +113,6 @@ public: // methods
 private: // data
     std::map<int, InvErrorInfo> m_table;     // table of error codes and messages
 };
-
-
-// ========================================
-// Error creation macro records the filename and line number
-// ========================================
-#define NewInvError(code) InvError::InvError((code), __LINE__, __FILE__)        // arg must be InvErrorCode
-#define NewInvErrorException(e) InvError::InvError((e), __LINE__, __FILE__)     // arg must be std::exception or derivative
 
 } // namespace inv_example
 

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include "error.h"
+#include "Error.h"
 
 using namespace std;
 namespace inv_example {

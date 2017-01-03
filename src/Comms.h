@@ -3,7 +3,7 @@
 #ifndef __COMMS__
 #define __COMMS__
 
-#include <cstdint>
+#include <cfloat>
 #include <vector>
 #include <map>
 #include "Timestamp.h"
@@ -44,8 +44,8 @@ public: // methods
 
 public: // data
     // Message protocol constants
-    static const uint8_t m_HEADER = 0xaa;     // first byte of every msg
-    static const int m_HEADER_LEN = 3;        // minimum message size
+    static const uint8_t m_HEADER;     // first byte of every msg
+    static const int m_HEADER_LEN;     // minimum message size
 
 private: // data
     // parser data

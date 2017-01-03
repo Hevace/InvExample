@@ -99,6 +99,14 @@ const map<PacketId, unsigned int> InvCommParser::m_packet_id_table{
     { PacketId::PEND_DATA, 10 },
 };
 
+
+// ========================================
+// Message protocol constants
+// ========================================
+const uint8_t InvCommParser::m_HEADER = 0xaa;     // first byte of every msg
+const int InvCommParser::m_HEADER_LEN = 3;        // minimum message size
+
+
 // ========================================
 // Look up the message length from the table
 // ========================================
@@ -151,7 +159,8 @@ CartForceCmdPacket::CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::FORCE_CMD) {
-        throw NewInvError(SYSERR_CART_FORCE_MSG_PARSE);
+        InvError e((SYSERR_CART_FORCE_MSG_PARSE), __LINE__, __FILE__);
+        throw e;
     }
     // parse data members
     m_force = bytes_to_double(get_data(), m_MAX_FORCE, m_MIN_FORCE, m_SCALE_FORCE).first;
@@ -160,7 +169,7 @@ CartForceCmdPacket::CartForceCmdPacket(std::vector<uint8_t> packet, InvTimestamp
 
 // encode a packet from data
 CartForceCmdPacket::CartForceCmdPacket(double force)
-    : m_force(force), CommPacketBase(PacketId::FORCE_CMD)
+    : CommPacketBase(PacketId::FORCE_CMD), m_force(force)
 {
     convert_to_bytes_double(get_data(), m_force, m_MAX_FORCE, m_MIN_FORCE, m_SCALE_FORCE);
 }
@@ -174,7 +183,8 @@ CartDataPacket::CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::CART_DATA) {
-        throw NewInvError(SYSERR_CART_DATA_MSG_PARSE);
+        InvError e(SYSERR_CART_DATA_MSG_PARSE, __LINE__, __FILE__);
+        throw e;
     }
     // parse data members
     vector<uint8_t>::const_iterator p = get_data();    // point to start of data
@@ -185,7 +195,7 @@ CartDataPacket::CartDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
 
 // encode a packet from data
 CartDataPacket::CartDataPacket(double cart_pos, double cart_vel)
-    : m_pos(cart_pos), m_vel(cart_vel), CommPacketBase(PacketId::CART_DATA)
+    : CommPacketBase(PacketId::CART_DATA), m_pos(cart_pos), m_vel(cart_vel)
 {
     auto p = get_data();      // point to start of data
     p = convert_to_bytes_double(p, m_pos, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
@@ -201,7 +211,8 @@ CartPollCmdPacket::CartPollCmdPacket(std::vector<uint8_t> packet, InvTimestamp t
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::POLL_CMD) {
-        throw NewInvError(SYSERR_CART_POLL_MSG_PARSE);
+        InvError e(SYSERR_CART_POLL_MSG_PARSE, __LINE__, __FILE__);
+        throw e;
     }
     // no data members
 }
@@ -223,7 +234,8 @@ CartKeepaliveCmdPacket::CartKeepaliveCmdPacket(std::vector<uint8_t> packet, InvT
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::KEEPALIVE_CMD) {
-        throw NewInvError(SYSERR_CART_KEEPALIVE_MSG_PARSE);
+        InvError e(SYSERR_CART_KEEPALIVE_MSG_PARSE, __LINE__, __FILE__);
+        throw e;
     }
     // no data members
 }
@@ -245,7 +257,8 @@ PendDataPacket::PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
     : CommPacketBase(packet, toa)
 {
     if (!InvCommParser::validate_packet(packet) || get_id() != PacketId::PEND_DATA) {
-        throw NewInvError(SYSERR_PEND_DATA_MSG_PARSE);
+        InvError e(SYSERR_PEND_DATA_MSG_PARSE, __LINE__, __FILE__);
+        throw e;
     }
     // parse data members
     vector<uint8_t>::const_iterator p = get_data();            // points to start of data
@@ -255,7 +268,7 @@ PendDataPacket::PendDataPacket(std::vector<uint8_t> packet, InvTimestamp toa)
 
 // encode a packet from data
 PendDataPacket::PendDataPacket(double pos)
-    : m_pos(pos), CommPacketBase(PacketId::PEND_DATA)
+    : CommPacketBase(PacketId::PEND_DATA), m_pos(pos)
 {
     convert_to_bytes_i16(get_data(), m_pos, m_MAX_POS, m_MIN_POS, m_SCALE_POS);
 }
