@@ -165,13 +165,29 @@ int main(int argc, char *argv[])
     cout << "Force Cmd, Force = " << msg.m_force << ", Timestamp = " << msg.get_toa() << endl;
     cout << endl;
 
-    cout << "Timestamp" << endl;
-    auto ts = InvTimestamp();
-    cout << ts << endl;
+    auto ts1 = InvTimestamp();
+    auto ts2 = ts1;
+    int c1 = 0;
+    while (ts1 == ts2) {
+        ts2 = InvTimestamp();
+        c1++;
+    }
+    auto ts3 = ts2;
+    int c2 = 0;
+    while (ts3 == ts2) {
+        ts3 = InvTimestamp();
+        c2++;
+    }
+    cout << "Min InvTimestamp delta = " << ts3 - ts2 << endl;
+    cout << "c1 = " << c1 << ", c2 = " << c2 << endl;
     cout << endl;
 
+    auto ts = InvTimestamp();
+    cout << "Start time " << ts << endl;
+
+    unique_ptr<IpcHighResTimer> phrt;
     try {
-        IpcHighResTimer hrt(10, dbg_callback);
+        phrt.reset(new IpcHighResTimer(10, dbg_callback));
     }
     catch (InvError e) {
         cout << "High Res Timer Error" << endl;
@@ -184,18 +200,15 @@ int main(int argc, char *argv[])
         cout << local_error << endl;
     }
 
-    // DEBUG add a test to print smallest timestamp increment
-
     // Run the system
     system_init();
     main_loop();
 
-
     // DEBUG test code in main
     cout << "dbg_count " << dbg_count << endl;
     auto tend = InvTimestamp();
-    cout << tend << endl;
-    cout << "elapsed " << tend - ts << endl;
+    cout << "Stop time " << tend << endl;
+    cout << "Elapsed " << tend - ts << endl;
 
     return 0;
 }

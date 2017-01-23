@@ -24,7 +24,8 @@ public: // methods
     std::chrono::system_clock::duration to_duration(const InvTimestamp& t0) const { return m_t - t0.m_t; }; // difference as a duration
 
     // operators
-    double operator-(const InvTimestamp &t0) { return std::chrono::duration<double, std::ratio<1, 1>>(to_duration(t0)).count(); }; // difference in seconds
+    double operator-(const InvTimestamp &t0) const { return std::chrono::duration<double, std::ratio<1, 1>>(to_duration(t0)).count(); }; // difference in seconds
+    bool operator==(const InvTimestamp &rhs) const { return m_t == rhs.m_t; };
 
 private: // data
     std::chrono::system_clock::time_point m_t;      // timestamp stored in the std library type

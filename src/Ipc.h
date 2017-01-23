@@ -141,9 +141,6 @@ public: // constructors
     IpcHighResTimer() = delete;                                             // must specify period and callback
     ~IpcHighResTimer();                                                     // cancel the timer
 
-public: // methods
-    void callback(void) { (*m_proc)(); };
-
 private: // methods
     static void timer_thread(IpcHighResTimer *pthis);
 

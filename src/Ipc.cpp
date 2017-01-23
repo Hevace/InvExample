@@ -74,6 +74,7 @@ IpcHighResTimer::IpcHighResTimer(unsigned int period_ms, IpcHighResTimerCallback
     if (proc == nullptr) {
         throw std::invalid_argument("High Res Timer has a null callback");
     }
+    m_proc = proc;
 
     // Create the timer
     int fd = timerfd_create(CLOCK_MONOTONIC, 0);
@@ -95,7 +96,7 @@ IpcHighResTimer::IpcHighResTimer(unsigned int period_ms, IpcHighResTimerCallback
     itval.it_interval.tv_sec = sec;         // timer period
     itval.it_interval.tv_nsec = ns;
     itval.it_value.tv_sec = sec;            // first timer expiration time
-    itval.it_value.tv_sec = ns;
+    itval.it_value.tv_nsec = ns;
     int ret = timerfd_settime(m_timerid, 0, &itval, 0);
     if (ret == -1) {
         InvError e(SYSERR_RESOURCE_ALLOCATION_FAILED, __LINE__, __FILE__);
